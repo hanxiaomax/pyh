@@ -10,7 +10,7 @@ PyH is a very simple python library that lets you write HTML content from within
   * Automatic tag closure when possible
   * Primitive verification of tag hierarchy
 =How to install PyH=
-Download the latest version of pyh from the [http://code.google.com/p/pyh/downloads/list Download tab] or directly from here [http://pyh.googlecode.com/files/pyh-0.1.tar.gz pyh-0.1.targ.gz], unpack it in your working directory or in your system's python directory, usually `/usr/lib/pythonX.X/site-packages` or anywhere visible by the environment variable `$PYTHONPATH`:
+Download the latest version of pyh from the [http://code.google.com/p/pyh/downloads/list Download tab] or directly from here [http://pyh.googlecode.com/files/pyh-0.1.tar.gz pyh-0.1.tar.gz], unpack it in your working directory or in your system's python directory, usually `/usr/lib/pythonX.X/site-packages` or anywhere visible by the environment variable `$PYTHONPATH`:
 {{{
 $ wget http://pyh.googlecode.com/files/pyh-0.1.tar.gz
 $ tar xvzf pyh-0.1.tar.gz -C ~/path_to_my_project/   #or
