@@ -76,4 +76,34 @@ Each `<html_tag>` listed in [UserManual#Available_tags Available tags] has a cor
 >>> div(txt='I love PyH!')
 '<div>I Love PyH!</div>\n'
 }}}
- * After closure a new line `\n` is inserted except for certain tags
+ * After closure a new line `\n` is inserted except for certain tags.
+==Available tags==
+===As functions===
+  * `table`
+  * `th`
+  * `tr`
+  * `td`
+  * `h2`
+  * `h1`
+  * `div`
+  * `fieldset`
+  * `select`
+  * `input`
+  * `span`
+  * `legend`
+  * `p`
+  * `option`
+  * `form`
+  * `img`
+  * `a`
+  * `head`
+  * `title`
+  * `link`
+  * `script`
+  * `body`
+  * `html`
+===As strings===
+  * `br = '<br />\n'`
+  * `nl = '\n'`
+  * `doctype = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"\n"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'`
+  * `charset = '<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />'`
