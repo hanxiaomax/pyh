@@ -1,7 +1,21 @@
+# @file: pyh.py
+# @purpose: a HTML tag generator
+# @author: Emmanuel Turlay <turlay@cern.ch>
+
+__doc__     = """The pyh.py module is the core of the PyH package. PyH lets you
+generate HTML tags from within your python code.
+See http://code.google.com/p/pyh/ for documentation.
+"""
+__author__  = "Emmanuel Turlay <turlay@cern.ch>"
+__version__ = '$Revision$'
+__date__ = '$Date$'
+
+
 from sys import _getframe
 nOpen={}
 
 def tag(**kw):
+    "Core function to generate tags"
     selfClose=['input','img','link']
     onlyOne=['html','body','head']
     noNewLine=['td','th','input']
