@@ -4,9 +4,35 @@
 
 PyH is a very simple python library that lets you write HTML content from within your python program. Hard-coding plain HTML into your python code is boring and can make your code completely unreadable. Plus, once you'll have a look at the source of the HTML file, it won't be readable either. PyH gives you a nice solution for all of this.
 ==Features==
-* Automatic formating of HTML tags
-* High customizability
-* full CSS awareness
-* Automatic tag closure when possible
-* Primitive verification of tag hierarchy
+  * Automatic formating of HTML tags
+  * High customizability
+  * full CSS awareness
+  * Automatic tag closure when possible
+  * Primitive verification of tag hierarchy
+=How to install PyH=
+Download the latest version of pyh from the [http://code.google.com/p/pyh/downloads/list Download tab] or directly from here [http://pyh.googlecode.com/files/pyh-0.1.tar.gz pyh-0.1.targ.gz], unpack it in your working directory or in your system's python directory, usually `/usr/lib/pythonX.X/site-packages` or anywhere visible by the environment variable `$PYTHONPATH`:
+{{{
+$ wget http://pyh.googlecode.com/files/pyh-0.1.tar.gz
+$ tar xvzf pyh-0.1.tar.gz -C ~/path_to_my_project/   #or
+$ sudo tar xvzf pyh-0.1.tar.gz -C /usr/lib/pythonX.X/site-packages
+}}}
+and use it as follows
 ==Quick example==
+{{{
+from pyh import *
+
+out=doctype
+out=doctype+nl
+out+=html(xmlns='http://www.w3.org/1999/xhtml',lang='en')
+out+=head()+charset+title(txt='Title of my page')
+out+=link(rel='stylesheet',type='text/css',href='myStylesheet.css')
+out+=script(type='text/javascript',src='myJavascript.js')        # auto-closure or script
+out+=head()+body()+h1(cl='center',txt='My big title')            # auto-closure of h1
+out+=div(cl='myCSSclass1 myCSSclass2',id='myCSSid1')
+out+=p(id='myCSSid2',txt='I love PyH!')                          # auto-closure of p
+our+=div()                                                       # closure of div
+out+=ValidW3C()+body()+html()                                    # closure of body,html
+f=open('index.html')
+f.write(out)
+f.close()
+}}}
