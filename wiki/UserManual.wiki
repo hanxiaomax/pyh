@@ -1,0 +1,12 @@
+#summary User manual for the PyH library
+
+= Introduction =
+
+PyH is a very simple python library that lets you write HTML content from within your python program. Hard-coding plain HTML into your python code is boring and can make your code completely unreadable. Plus, once you'll have a look at the source of the HTML file, it won't be readable either. PyH gives you a nice solution for all of this.
+==Features==
+* Automatic formating of HTML tags
+* High customizability
+* full CSS awareness
+* Automatic tag closure when possible
+* Primitive verification of tag hierarchy
+==Quick example==
