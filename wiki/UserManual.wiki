@@ -57,3 +57,23 @@ f.close()
 >>> div(cl='myCSSclass1 myCSSclass2', id='myCSSid1', txt=p(id='myCSSid2', txt='I love PyH!'))
 '<div class="myCSSclass1 myCSSclass2" id="myCSSid1"><p id="myCSSid2">I love PyH!</p>\n</div>\n'
 }}}
+=Full reference=
+===HTML tags===
+Each `<html_tag>` listed in [UserManual#Available_tags Available tags] has a corresponding function `pyh.html_tag(**kw)` that takes as input keyword arguments corresponding to the attributes of the tag. Keywords are the same as attribute names except for the CSS class of the tag which uses the keyword `cl`. The function returns a string of the desired tag.
+===Tag closure policy===
+  * If a tag was previously open, the next call to the associated function will by default close the tag.
+{{{
+>>> div()+div()
+'<div></div>\n'
+}}}
+  * To force opening of a new tag, the argument `open=True` must be passed.
+{{{
+>>> div() + div(open=True) + div() + div()
+'<div><div></div>\n</div>\n'
+}}}
+  * If the keywords `src` or `txt` are specified, the tag will be closed automatically.
+{{{
+>>> div(txt='I love PyH!')
+'<div>I Love PyH!</div>\n'
+}}}
+ * After closure a new line `\n` is inserted except for certain tags
