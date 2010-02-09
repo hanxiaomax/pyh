@@ -1,5 +1,5 @@
 #summary User manual for the PyH library
-<wiki:toc max_depth="1" />
+<wiki:toc max_depth="2" />
 = Introduction =
 
 PyH is a very simple python library that lets you write HTML content from within your python program. Hard-coding plain HTML into your python code is boring and can make your code completely unreadable. Plus, once you'll have a look at the source of the HTML file, it won't be readable either. PyH gives you a nice solution for all of this.
@@ -58,9 +58,9 @@ f.close()
 '<div class="myCSSclass1 myCSSclass2" id="myCSSid1"><p id="myCSSid2">I love PyH!</p>\n</div>\n'
 }}}
 =Full reference=
-===HTML tags===
+==HTML tags==
 Each `<html_tag>` listed in [UserManual#Available_tags Available tags] has a corresponding function `pyh.html_tag(**kw)` that takes as input keyword arguments corresponding to the attributes of the tag. Keywords are the same as attribute names except for the CSS class of the tag which uses the keyword `cl`. The function returns a string of the desired tag.
-===Tag closure policy===
+==Tag closure policy==
   * If a tag was previously open, the next call to the associated function will by default close the tag.
 {{{
 >>> div()+div()
