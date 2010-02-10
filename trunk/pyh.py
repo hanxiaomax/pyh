@@ -31,7 +31,7 @@ def tag(**kw):
     out = '<%s%s' % ((not open) * '/', _name)
     if open:
         for i,v in kw.iteritems():
-            if v and i != 'txt' and i != 'close':
+            if i != 'txt' and i != 'open':
                 if i == 'cl': i = 'class'
                 out += ' %s="%s"' % (i, v)
     if _name in selfClose:
@@ -48,6 +48,7 @@ def tag(**kw):
 
 def table(**kw): return tag(**kw)
 def th(**kw): return tag(**kw)
+def b(**kw): return tag(**kw)
 def tr(**kw): return tag(**kw)
 def td(**kw): return tag(**kw)
 def h2(**kw): return tag(**kw)
@@ -69,8 +70,8 @@ def link(**kw): return tag(**kw)
 def script(**kw): return tag(**kw)
 def body(**kw): return tag(**kw)
 def html(**kw): return tag(**kw)
-br = '<br />'
 nl = '\n'
+br = '<br />'+nl
 doctype = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"\n"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
 charset = '<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />'
 
