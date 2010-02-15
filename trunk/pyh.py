@@ -11,7 +11,7 @@ __version__ = '$Revision$'
 __date__ = '$Date$'
 
 
-from sys import _getframe
+from sys import _getframe, stdout
 nOpen={}
 
 def tag(**kw):
@@ -72,10 +72,67 @@ def body(**kw): return tag(**kw)
 def html(**kw): return tag(**kw)
 nl = '\n'
 br = '<br />'+nl
-doctype = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"\n"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
-charset = '<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />'
+doctype = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"\n"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n'
+charset = '<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />\n'
 
 def ValidW3C():
     out = a(href='http://validator.w3.org/check?uri=referer',
                     txt=img(src='http://www.w3.org/Icons/valid-xhtml10', alt='Valid XHTML 1.0 Strict'))
     return out
+
+class PyH():
+    _header, _body, _footer = '', '', ''
+    _javascripts, _stylesheets, _meta = [], [], []
+    _lang = 'en'
+    def __init__(self, title='MyPyHPage'):
+        self._title = title
+    
+    def addJavaScript(self, js):
+        if not isinstance(js, list): js = [js]
+        self._javascripts += js
+
+    def addCSS(self, css):
+        if not isinstance(css, list): css = [css]
+        self._stylesheets += css
+
+    def addMeta(self, name='', content='', http_equiv=''):
+        if content:
+            meta = {'content':content, 'name':name, 'http-equiv':http_equiv}
+
+    def setLang(self, l):
+        self._lang = l
+
+    def __iadd__(self, string):
+        self._body += string
+        return self
+
+    def render(self,file=''):
+        if file: f = open(file, 'w')
+        else: f = stdout
+        f.write(self.renderHeader())
+        f.write(self._body)
+        f.write(self.renderFooter())
+        f.flush()
+        f.close()
+
+    def renderHeader(self):
+        h = self._header
+        h += doctype
+        h += html(xmlns='http://www.w3.org/1999/xhtml', lang=self._lang)
+        h += head()
+        h += charset
+        h += title(txt=self._title)
+        for s in self._stylesheets:
+            h += link(rel='stylesheet',type='text/css',href=s)
+        for j in self._javascripts:
+            h += script(type='text/javascript',src=j)
+        h += head()
+        h += body()
+        return h
+
+    def renderFooter(self):
+        f = self._footer
+        f += body()
+        f += html()
+        return f
+    
