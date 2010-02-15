@@ -76,6 +76,6 @@ doctype = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"\n"http://www
 charset = '<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />'
 
 def ValidW3C():
-    out = div(txt=a(href='http://validator.w3.org/check?uri=referer',
-                    txt=img(src='http://www.w3.org/Icons/valid-xhtml10', alt='Valid XHTML 1.0 Strict')))
+    out = a(href='http://validator.w3.org/check?uri=referer',
+                    txt=img(src='http://www.w3.org/Icons/valid-xhtml10', alt='Valid XHTML 1.0 Strict'))
     return out
