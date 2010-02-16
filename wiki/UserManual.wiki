@@ -12,11 +12,12 @@ PyH is a very simple python library that lets you write HTML content from within
 =How to install PyH=
 Download the latest version of pyh from the [http://code.google.com/p/pyh/downloads/list Download tab] or directly from here [http://pyh.googlecode.com/files/PyH-0.0.2.tar.gz PyH-0.0.2.tar.gz], unpack it in your working directory or in your system's python directory, usually `/usr/lib/pythonX.X/site-packages` or anywhere visible by the environment variable `$PYTHONPATH`:
 {{{
-$ wget http://pyh.googlecode.com/files/pyh-0.1.tar.gz
-$ tar xvzf pyh-0.1.tar.gz -C ~/path_to_my_project/   #or
-$ sudo tar xvzf pyh-0.1.tar.gz -C /usr/lib/pythonX.X/site-packages
+$ wget http://pyh.googlecode.com/files/PyH-0.0.2.tar.gz
+$ tar xvzf PyH-0.0.2.tar.gz
+$ cd PyH-0.0.2
+$ sudo python setup.py install
 }}}
-and use it as follows
+If you do not have root privileges, simply copy the file `PyH-0.0.2/pyh.py` into your project's directory.
 ===Quick example===
 {{{
 from pyh import *
