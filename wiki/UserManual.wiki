@@ -17,23 +17,19 @@ $ tar xvzf pyh-0.1.tar.gz -C ~/path_to_my_project/   #or
 $ sudo tar xvzf pyh-0.1.tar.gz -C /usr/lib/pythonX.X/site-packages
 }}}
 and use it as follows
-==Quick example==
+===Quick example===
 {{{
-from pyh.pyh import *
+from pyh import *
 
-out = doctype
-out += html(xmlns='http://www.w3.org/1999/xhtml', lang='en')
-out += head() + charset + title(txt='Title of my page')
-out += link(rel='stylesheet', type='text/css', href='myStylesheet.css')
-out += script(type='text/javascript', src='myJavascript.js')  # auto-closure or script
-out += head() + body() + h1(cl='center', txt='My big title')  # auto-closure of h1
-out += div(cl='myCSSclass1 myCSSclass2', id='myCSSid1')
-out += p(id='myCSSid2', txt='I love PyH!')                    # auto-closure of p
-our += div()                                                  # closure of div
-out += ValidW3C() + body() + html()                           # closure of body,html
-f = open('index.html')
-f.write(out)
-f.close()
+page = PyH('My wonderful PyH page')
+page.addCSS(['myStylesheet1.css', 'myStylesheet2.css'])
+page.addJavaScript(['myJavascript1.js', 'myJavascript2.js'])
+page += h1(cl='center', txt='My big title')                    # auto-closure of h1
+page += div(cl='myCSSclass1 myCSSclass2', id='myCSSid1')
+page += p(id='myCSSid2', txt='I love PyH!')                    # auto-closure of p
+page += div()                                                  # closure of div
+page += ValidW3C()                           
+page.render()
 }}}
 =Express manual=
   * The pyh.py module resides in the pyh directory so that you have to import it as such :
@@ -58,8 +54,44 @@ f.close()
 '<div class="myCSSclass1 myCSSclass2" id="myCSSid1"><p id="myCSSid2">I love PyH!</p>\n</div>\n'
 }}}
 =Full reference=
+==Header and PyH class==
+The first thing to do is to instantiate the PyH class
+{{{
+page = PyH('My wonderful PyH page')
+}}}
+Then you can add a CSS
+{{{
+page.addCSS('myCSS.css')
+}}}
+or multiple CSS at the same time
+{{{
+page.addCSS(['myCSS1.css', 'myCSS2.css'])
+}}}
+Similarly, you can add javascript files
+{{{
+page.addJavaScript('myJavaScript.js')
+}}}
+or several at the same time. You can set the language of your page with
+{{{
+lang.setLang('fr')
+}}}
 ==HTML tags==
 Each `<html_tag>` listed in [UserManual#Available_tags Available tags] has a corresponding function `pyh.html_tag(**kw)` that takes as input keyword arguments corresponding to the attributes of the tag. Keywords are the same as attribute names except for the CSS class of the tag which uses the keyword `cl`. The function returns a string of the desired tag.
+==Filling the body==
+In order to fill the body of your page, just use the operator on you PyH object to append a tag.
+{{{
+page += h1(cl="myH1Class", txt="My beautiful title")
+}}}
+==Closing and rendering==
+In order for you page do be displayed you need to call
+{{{
+page.render()
+}}}
+This call will generated the header, body and footer of your page and print it to `stdout`.
+If you want to write the page to a file instead of `stdout`, just use
+{{{
+page.render('myHTMLFile.html')
+}}}
 ==Tag closure policy==
   * If a tag was previously open, the next call to the associated function will by default close the tag.
 {{{
