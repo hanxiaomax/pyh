@@ -7,12 +7,21 @@ generate HTML tags from within your python code.
 See http://code.google.com/p/pyh/ for documentation.
 """
 __author__ = "Emmanuel Turlay <turlay@cern.ch>"
-__version__ = '$Revision$'
+__version__ = '$Revision: 19 $'
 __date__ = '$Date$'
 
-
-from sys import _getframe, stdout
+from sys import _getframe, stdout, modules
 nOpen={}
+
+nl = '\n'
+br = '<br />'+nl
+doctype = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"\n"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n'
+charset = '<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />\n'
+
+tags = ['html', 'body', 'head', 'link', 'meta', 'div', 'p', 'form', 'legend', 
+        'input', 'select', 'span', 'b', 'i', 'option', 'img', 'script',
+        'table', 'tr', 'td', 'th', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        'fieldset', 'a', 'title']
 
 def tag(**kw):
     "Core function to generate tags"
@@ -46,34 +55,15 @@ def tag(**kw):
     if not open and _name not in noNewLine: out += nl
     return out
 
-def table(**kw): return tag(**kw)
-def th(**kw): return tag(**kw)
-def b(**kw): return tag(**kw)
-def tr(**kw): return tag(**kw)
-def td(**kw): return tag(**kw)
-def h2(**kw): return tag(**kw)
-def h1(**kw): return tag(**kw)
-def div(**kw): return tag(**kw)
-def fieldset(**kw): return tag(**kw)
-def select(**kw): return tag(**kw)
-def input(**kw): return tag(**kw)
-def span(**kw): return tag(**kw)
-def legend(**kw): return tag(**kw)
-def p(**kw): return tag(**kw)
-def option(**kw): return tag(**kw)
-def form(**kw): return tag(**kw)
-def img(**kw): return tag(**kw)
-def a(**kw): return tag(**kw)
-def head(**kw): return tag(**kw)
-def title(**kw): return tag(**kw)
-def link(**kw): return tag(**kw)
-def script(**kw): return tag(**kw)
-def body(**kw): return tag(**kw)
-def html(**kw): return tag(**kw)
-nl = '\n'
-br = '<br />'+nl
-doctype = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"\n"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n'
-charset = '<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />\n'
+def fcn(name):
+    def f(**kw):
+        kw['tagname'] = name
+        return kw
+    return f
+
+thisModule = modules[__name__]
+
+for t in tags: setattr(thisModule, t, fcn(t)) 
 
 def ValidW3C():
     out = a(href='http://validator.w3.org/check?uri=referer',
@@ -86,6 +76,7 @@ class PyH():
     _lang = 'en'
     def __init__(self, title='MyPyHPage'):
         self._title = title
+        self._counter = TagCounter(title)
     
     def addJavaScript(self, js):
         if not isinstance(js, list): js = [js]
@@ -102,10 +93,37 @@ class PyH():
     def setLang(self, l):
         self._lang = l
 
-    def __iadd__(self, string):
-        self._body += string
+    def __iadd__(self, **kw):
+        self._body += self.tag(**kw)
         return self
 
+    def tag(**kw):
+        "Core function to generate tags"
+        noNewLine = ['td', 'th', 'input']
+        selfClose = ['input', 'img', 'link']
+        _name = kw.get('tagname', None)
+        if not isLegal(tag): return ''
+        open = kw.get('open', cl in kw.keys() or id in kw.keys() or c.isClosed(_name))
+        c = self._counter
+        if not c.isAllowed(_name, open) : return ''
+        out = '<%s%s' % ((not open) * '/', _name)
+        if open:
+            c.open(_name)
+            for i,v in kw.iteritems():
+                if i != 'txt' and i != 'open':
+                    if i == 'cl': i = 'class'
+                    out += ' %s="%s"' % (i, v)
+        else: c.close(_name)
+        if _name if selfClose:
+            out += ' /'
+            c.close(_name)
+        out += '>'
+        if 'txt' in kw.keys() or ('src' in kw.keys() and _name != 'img'):
+            out += '%s%s' % (kw.get('txt', ''), '</%s>' % _name)
+            c.close(_name)
+        if not open and _name not in noNewLine: out += nl
+        return out
+    
     def render(self,file=''):
         if file: f = open(file, 'w')
         else: f = stdout
@@ -136,3 +154,35 @@ class PyH():
         f += html()
         return f
     
+class TagCounter():
+    _count = {}
+    _lastOpen = []
+    for t in tags: _count[t], _open[t] = 0, None
+    def __init__(self, name):
+        self._name = name
+    def open(self, tag):
+        if isLegal(tag): 
+            _count[tag] += 1
+            _lastOpen += [tag]
+    def close(self, tag):
+        if isLegal(tag) and _lastOpen[-1] == tag: 
+            _count[tag] -= 1
+            _lastOpen.pop()
+        else:
+            print 'Cross tagging is wrong'
+    def isAllowed(self, tag, open):
+        if not open and self.isClosed(tag):
+            print 'TRYING TO CLOSE NON-OPEN TAG: %s' % tag
+            return False
+        return True
+    def isOpen(self, tag):
+        if isLegal(tag): return _count[tag]
+    def isClosed(self, tag):
+        if isLegal(tag): return not _count[tag]
+
+    
+def isLegal(tag):
+    if tag in tags: return True
+    else:
+        print 'ILLEGAL TAG: %s' % tag
+        return False
