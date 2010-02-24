@@ -23,39 +23,7 @@ tags = ['html', 'body', 'head', 'link', 'meta', 'div', 'p', 'form', 'legend',
         'table', 'tr', 'td', 'th', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
         'fieldset', 'a', 'title']
 
-def tag(**kw):
-    "Core function to generate tags"
-    selfClose = ['input', 'img', 'link']
-    onlyOne = ['html', 'body', 'head']
-    noNewLine = ['td', 'th', 'input']
-    _name = kw.get('tagname', None)
-    if not _name: _name = _getframe(1).f_code.co_name
-    #if _name in onlyOne and nOpen.get(_name,0) : print 'WARNING: tag %s already open and closed' % _name
-    open = kw.get('open', None)
-    if open == None:
-        if nOpen.get(_name, 0) and not kw.get('cl', None) and not kw.get('id', None): open = False
-        else: open = True
-    if not nOpen.get(_name, 0) and not open: print 'WARNING: trying to close non-open tag'
-    nOpen[_name] = nOpen.get(_name, 0) + (open * 1 + (not open) * (-1))
-    out = '<%s%s' % ((not open) * '/', _name)
-    if open:
-        for i,v in kw.iteritems():
-            if i != 'txt' and i != 'open':
-                if i == 'cl': i = 'class'
-                out += ' %s="%s"' % (i, v)
-    if _name in selfClose:
-        out += ' /'
-        nOpen[_name] -= 1
-        open = False
-    out += '>'
-    if 'txt' in kw.keys() or ('src' in kw.keys() and _name != 'img'):
-        out += '%s%s' % (kw.get('txt', ''), '</%s>' % _name)
-        nOpen[_name] -= 1
-        open = False
-    if not open and _name not in noNewLine: out += nl
-    return out
-
-def fcn(name):
+def TagFactory(name):
     def f(**kw):
         kw['tagname'] = name
         return kw
@@ -63,7 +31,7 @@ def fcn(name):
 
 thisModule = modules[__name__]
 
-for t in tags: setattr(thisModule, t, fcn(t)) 
+for t in tags: setattr(thisModule, t, TagFactory(t)) 
 
 def ValidW3C():
     out = a(href='http://validator.w3.org/check?uri=referer',
