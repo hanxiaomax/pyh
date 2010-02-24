@@ -10,7 +10,7 @@ __author__ = "Emmanuel Turlay <turlay@cern.ch>"
 __version__ = '$Revision: 19 $'
 __date__ = '$Date$'
 
-from sys import _getframe, stdout, modules
+from sys import _getframe, stdout, modules, version
 nOpen={}
 
 nl = '\n'
@@ -23,10 +23,19 @@ tags = ['html', 'body', 'head', 'link', 'meta', 'div', 'p', 'form', 'legend',
         'table', 'tr', 'td', 'th', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
         'fieldset', 'a', 'title']
 
+class Tag(list):
+    tagname = ''
+    children = []
+    def __init__(self, **kw):
+        self.attributes = kw
+    def __iadd__(self, obj):
+        if isinstance(obj, Tag): self.append(obj)
+        else: print 'ERROR Attempt to embed non-Tag object'
+        return self
+            
 def TagFactory(name):
-    def f(**kw):
-        kw['tagname'] = name
-        return kw
+    class f(Tag):
+        tagname = name
     return f
 
 thisModule = modules[__name__]
@@ -38,8 +47,9 @@ def ValidW3C():
                     txt=img(src='http://www.w3.org/Icons/valid-xhtml10', alt='Valid XHTML 1.0 Strict'))
     return out
 
-class PyH():
-    _header, _body, _footer = '', '', ''
+class PyH:
+    _header, _footer = '', '', ''
+    _body = []
     _javascripts, _stylesheets, _meta = [], [], []
     _lang = 'en'
     def __init__(self, title='MyPyHPage'):
@@ -61,17 +71,17 @@ class PyH():
     def setLang(self, l):
         self._lang = l
 
-    def __iadd__(self, **kw):
-        self._body += self.tag(**kw)
+    def __iadd__(self, tag):
+        self._body += tag
         return self
 
-    def tag(**kw):
+    def tag(self, **kw):
         "Core function to generate tags"
         noNewLine = ['td', 'th', 'input']
         selfClose = ['input', 'img', 'link']
         _name = kw.get('tagname', None)
-        if not isLegal(tag): return ''
-        open = kw.get('open', cl in kw.keys() or id in kw.keys() or c.isClosed(_name))
+        if not isLegal(_name): return ''
+        open = kw.get('open', 'cl' in kw or 'id' in kw or c.isClosed(_name))
         c = self._counter
         if not c.isAllowed(_name, open) : return ''
         out = '<%s%s' % ((not open) * '/', _name)
@@ -82,7 +92,7 @@ class PyH():
                     if i == 'cl': i = 'class'
                     out += ' %s="%s"' % (i, v)
         else: c.close(_name)
-        if _name if selfClose:
+        if _name in selfClose:
             out += ' /'
             c.close(_name)
         out += '>'
@@ -122,20 +132,20 @@ class PyH():
         f += html()
         return f
     
-class TagCounter():
+class TagCounter:
     _count = {}
     _lastOpen = []
-    for t in tags: _count[t], _open[t] = 0, None
+    for t in tags: _count[t] = 0
     def __init__(self, name):
         self._name = name
     def open(self, tag):
         if isLegal(tag): 
-            _count[tag] += 1
-            _lastOpen += [tag]
+            self._count[tag] += 1
+            self._lastOpen += [tag]
     def close(self, tag):
-        if isLegal(tag) and _lastOpen[-1] == tag: 
-            _count[tag] -= 1
-            _lastOpen.pop()
+        if isLegal(tag) and self._lastOpen[-1] == tag: 
+            self._count[tag] -= 1
+            self._lastOpen.pop()
         else:
             print 'Cross tagging is wrong'
     def isAllowed(self, tag, open):
@@ -144,9 +154,9 @@ class TagCounter():
             return False
         return True
     def isOpen(self, tag):
-        if isLegal(tag): return _count[tag]
+        if isLegal(tag): return self._count[tag]
     def isClosed(self, tag):
-        if isLegal(tag): return not _count[tag]
+        if isLegal(tag): return not self._count[tag]
 
     
 def isLegal(tag):
