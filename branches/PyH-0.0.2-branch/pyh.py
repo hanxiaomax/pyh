@@ -28,37 +28,44 @@ selfClose = ['input', 'img', 'link']
 class Tag(list):
     tagname = ''
 
-    def __init__(self, **kw):
+    def __init__(self, *arg, **kw):
         self.attributes = kw
-        self += [kw.get('txt', '')]
+        if 'txt' in kw: self += [Tag(kw['txt'])]
+        self.extend(arg)
 
     def __iadd__(self, obj):
         if isinstance(obj, Tag): self.append(obj)
         else: print 'ERROR Attempt to embed non-Tag object'
         return self
+    
+    def __add__(self, obj):
+        if self.tagname: return Tag(self, obj)
+        self.append(obj)
+        return self
 
     def render(self):
-        result = '<%s %s %s>' % (tagname, self.renderAtt(), self.selfClose()*'/')
-        if not self.selfClose()
-        for c in self:
-            result += '%s' % c
+        result = ''
+        if self.tagname:
+            result = '<%s%s%s>' % (self.tagname, self.renderAtt(), self.selfClose()*' /')
+        if not self.selfClose():
+            for c in self:
+                if len(c) == 1 and not c.tagname:
+                    r = c[0]
+                else:
+                    r = c.render()
+                result += '%s' % r
+        return result
 
     def renderAtt(self):
         result = ''
         for n, v in self.attributes:
             if n != 'txt' and n != 'open':
                 if n == 'cl': n = 'class'
-                result += '%s="%s"' % (n, v)
+                result += ' %s="%s"' % (n, v)
         return result
 
     def selfClose(self):
-        return tagname in selfClose
-
-    def __add__(self, obj):
-        if isinstance(obj, Tag): return [self, obj]
-        else:
-            print 'ERROR Attempt to embed non-Tag object'
-            return self
+        return self.tagname in selfClose
     
 def TagFactory(name):
     class f(Tag):
@@ -75,7 +82,7 @@ def ValidW3C():
     return out
 
 class PyH (Tag):
-    _header, _footer = '', '', ''
+    _header, _footer = '', ''
     tagname = 'body'
     javascripts, stylesheets, _meta = [], [], []
     _lang = 'en'
