@@ -23,16 +23,43 @@ tags = ['html', 'body', 'head', 'link', 'meta', 'div', 'p', 'form', 'legend',
         'table', 'tr', 'td', 'th', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
         'fieldset', 'a', 'title']
 
+selfClose = ['input', 'img', 'link']
+
 class Tag(list):
     tagname = ''
-    children = []
+
     def __init__(self, **kw):
         self.attributes = kw
+        self += [kw.get('txt', '')]
+
     def __iadd__(self, obj):
         if isinstance(obj, Tag): self.append(obj)
         else: print 'ERROR Attempt to embed non-Tag object'
         return self
-            
+
+    def render(self):
+        result = '<%s %s %s>' % (tagname, self.renderAtt(), self.selfClose()*'/')
+        if not self.selfClose()
+        for c in self:
+            result += '%s' % c
+
+    def renderAtt(self):
+        result = ''
+        for n, v in self.attributes:
+            if n != 'txt' and n != 'open':
+                if n == 'cl': n = 'class'
+                result += '%s="%s"' % (n, v)
+        return result
+
+    def selfClose(self):
+        return tagname in selfClose
+
+    def __add__(self, obj):
+        if isinstance(obj, Tag): return [self, obj]
+        else:
+            print 'ERROR Attempt to embed non-Tag object'
+            return self
+    
 def TagFactory(name):
     class f(Tag):
         tagname = name
@@ -47,33 +74,21 @@ def ValidW3C():
                     txt=img(src='http://www.w3.org/Icons/valid-xhtml10', alt='Valid XHTML 1.0 Strict'))
     return out
 
-class PyH:
+class PyH (Tag):
     _header, _footer = '', '', ''
-    _body = []
-    _javascripts, _stylesheets, _meta = [], [], []
+    tagname = 'body'
+    javascripts, stylesheets, _meta = [], [], []
     _lang = 'en'
     def __init__(self, title='MyPyHPage'):
         self._title = title
         self._counter = TagCounter(title)
     
-    def addJavaScript(self, js):
-        if not isinstance(js, list): js = [js]
-        self._javascripts += js
-
-    def addCSS(self, css):
-        if not isinstance(css, list): css = [css]
-        self._stylesheets += css
-
     def addMeta(self, name='', content='', http_equiv=''):
         if content:
             meta = {'content':content, 'name':name, 'http-equiv':http_equiv}
 
     def setLang(self, l):
         self._lang = l
-
-    def __iadd__(self, tag):
-        self._body += tag
-        return self
 
     def tag(self, **kw):
         "Core function to generate tags"
