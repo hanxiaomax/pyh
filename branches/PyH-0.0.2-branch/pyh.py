@@ -27,14 +27,14 @@ selfClose = ['input', 'img', 'link']
 
 class Tag(list):
     tagname = ''
-
+    
     def __init__(self, *arg, **kw):
         self.attributes = kw
         if 'txt' in kw: self += [kw['txt']]
         self.extend(arg)
 
     def __iadd__(self, obj):
-        if isinstance(obj, Tag): 
+        if isinstance(obj, Tag): #self.append(obj)
             if obj.tagname: self.append(obj)
             else: self.extend(obj)
         else: print 'ERROR Attempt to embed non-Tag object'
@@ -46,23 +46,17 @@ class Tag(list):
         return self
 
     def render(self):
-        result, closed, toClose = '', False, []
+        result = ''
         if self.tagname:
             result = '<%s%s%s>' % (self.tagname, self.renderAtt(), self.selfClose()*' /')
         if not self.selfClose():
             for c in self:
                 if isinstance(c, Tag):
-                    r, closed = c.render()
-                else: r, closed = c, True
-                result += r
-                if not closed : 
-                    toClose += [c.tagname]
+                    result += c.render()
+                else: result += c
         if len(self) and self.tagname: 
-            for t in toClose: 
-                result += '</%s>' % t
             result += '</%s>' % self.tagname
-            closed = True
-        return result, closed
+        return result
 
     def renderAtt(self):
         result = ''
@@ -90,20 +84,17 @@ def ValidW3C():
     return out
 
 class PyH (Tag):
-    _header, _footer = '', ''
+    header, footer = '', ''
     tagname = 'body'
     javascripts, stylesheets, _meta = [], [], []
-    _lang = 'en'
+    lang = 'en'
     def __init__(self, title='MyPyHPage'):
-        self._title = title
-        self._counter = TagCounter(title)
+        self.title = title
+        self.counter = TagCounter(title)
     
     def addMeta(self, name='', content='', http_equiv=''):
         if content:
             meta = {'content':content, 'name':name, 'http-equiv':http_equiv}
-
-    def setLang(self, l):
-        self._lang = l
 
     def tag(self, **kw):
         "Core function to generate tags"
@@ -132,28 +123,26 @@ class PyH (Tag):
         if not open and _name not in noNewLine: out += nl
         return out
     
-    def render(self,file=''):
+    def printOut(self,file=''):
         if file: f = open(file, 'w')
         else: f = stdout
-        f.write(self.renderHeader())
-        f.write(self._body)
-        f.write(self.renderFooter())
+        self += doctype
+        html = self.renderHeader()
+        html += self
+        f.write(html.render())
         f.flush()
         f.close()
 
     def renderHeader(self):
-        h = self._header
-        h += doctype
-        h += html(xmlns='http://www.w3.org/1999/xhtml', lang=self._lang)
-        h += head()
-        h += charset
-        h += title(txt=self._title)
+        h = html(xmlns='http://www.w3.org/1999/xhtml', lang=self._lang)
+        he = head()
+        he += charset
+        he += title(txt=self._title)
         for s in self._stylesheets:
-            h += link(rel='stylesheet',type='text/css',href=s)
+            he += link(rel='stylesheet',type='text/css',href=s)
         for j in self._javascripts:
-            h += script(type='text/javascript',src=j)
-        h += head()
-        h += body()
+            he += script(type='text/javascript',src=j)
+        h += he
         return h
 
     def renderFooter(self):
