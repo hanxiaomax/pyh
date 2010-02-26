@@ -30,11 +30,13 @@ class Tag(list):
 
     def __init__(self, *arg, **kw):
         self.attributes = kw
-        if 'txt' in kw: self += [Tag(kw['txt'])]
+        if 'txt' in kw: self += [kw['txt']]
         self.extend(arg)
 
     def __iadd__(self, obj):
-        if isinstance(obj, Tag): self.append(obj)
+        if isinstance(obj, Tag): 
+            if obj.tagname: self.append(obj)
+            else: self.extend(obj)
         else: print 'ERROR Attempt to embed non-Tag object'
         return self
     
@@ -44,17 +46,23 @@ class Tag(list):
         return self
 
     def render(self):
-        result = ''
+        result, closed, toClose = '', False, []
         if self.tagname:
             result = '<%s%s%s>' % (self.tagname, self.renderAtt(), self.selfClose()*' /')
         if not self.selfClose():
             for c in self:
-                if len(c) == 1 and not c.tagname:
-                    r = c[0]
-                else:
-                    r = c.render()
-                result += '%s' % r
-        return result
+                if isinstance(c, Tag):
+                    r, closed = c.render()
+                else: r, closed = c, True
+                result += r
+                if not closed : 
+                    toClose += [c.tagname]
+        if len(self) and self.tagname: 
+            for t in toClose: 
+                result += '</%s>' % t
+            result += '</%s>' % self.tagname
+            closed = True
+        return result, closed
 
     def renderAtt(self):
         result = ''
