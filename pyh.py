@@ -27,22 +27,36 @@ selfClose = ['input', 'img', 'link']
 
 class Tag(list):
     tagname = ''
-    
+
     def __init__(self, *arg, **kw):
         self.attributes = kw
-        if 'txt' in kw: self += [kw['txt']]
+        if self.tagname : 
+            name = self.tagname
+            self.isSeq = False
+        else: 
+            name = 'sequence'
+            self.isSeq = True
+        self.id = kw.get('id', name)
         self.extend(arg)
+        for a in arg: self.addObj(a)
 
     def __iadd__(self, obj):
-        if isinstance(obj, Tag): #self.append(obj)
-            if obj.tagname: self.append(obj)
-            else: self.extend(obj)
-        else: print 'ERROR Attempt to embed non-Tag object'
+        if isinstance(obj, Tag):
+            if obj.isSeq: 
+                for o in obj: self.addObj(o)
+            else: 
+                self.addObj(obj)
+        else: self.addObj(obj, 'content')
         return self
     
+    def addObj(self, obj, id=''):
+        if isinstance(obj, Tag): id = obj.id
+        self.append(obj)
+        setattr(self, obj, id)
+
     def __add__(self, obj):
         if self.tagname: return Tag(self, obj)
-        self.append(obj)
+        self.addObj(obj)
         return self
 
     def render(self):
