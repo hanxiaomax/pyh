@@ -21,13 +21,13 @@ charset = '<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />\
 tags = ['html', 'body', 'head', 'link', 'meta', 'div', 'p', 'form', 'legend', 
         'input', 'select', 'span', 'b', 'i', 'option', 'img', 'script',
         'table', 'tr', 'td', 'th', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-        'fieldset', 'a', 'title']
+        'fieldset', 'a', 'title', 'body', 'head', 'title', 'script']
 
 selfClose = ['input', 'img', 'link']
 
 class Tag(list):
     tagname = ''
-
+    
     def __init__(self, *arg, **kw):
         self.attributes = kw
         if self.tagname : 
@@ -37,22 +37,32 @@ class Tag(list):
             name = 'sequence'
             self.isSeq = True
         self.id = kw.get('id', name)
-        self.extend(arg)
+        #self.extend(arg)
         for a in arg: self.addObj(a)
 
     def __iadd__(self, obj):
-        if isinstance(obj, Tag):
-            if obj.isSeq: 
-                for o in obj: self.addObj(o)
-            else: 
-                self.addObj(obj)
-        else: self.addObj(obj, 'content')
+        if obj.isSeq:
+            for o in obj: self.addObj(o)
+        else: self.addObj(obj)
         return self
     
-    def addObj(self, obj, id=''):
-        if isinstance(obj, Tag): id = obj.id
+    def addObj(self, obj):
         self.append(obj)
-        setattr(self, obj, id)
+        id=self.setID(obj)
+        setattr(self, id, obj)
+
+    def setID(self, obj):
+        if isinstance(obj, Tag):
+            if obj.id : return obj.id
+            else :
+                id = obj.tagname
+                n = len([t for t in self if isinstance(t, Tag) and t.id.startswith(id)])
+        else:
+            id = 'content'
+            n = len([t for t in self if not isinstance(t, Tag)])
+        if n: id = '%s-%03i' % (id, n)
+        if isinstance(obj, Tag): obj.id = id
+        return id
 
     def __add__(self, obj):
         if self.tagname: return Tag(self, obj)
@@ -68,13 +78,14 @@ class Tag(list):
                 if isinstance(c, Tag):
                     result += c.render()
                 else: result += c
-        if len(self) and self.tagname: 
-            result += '</%s>' % self.tagname
+            if self.tagname: 
+                result += '</%s>' % self.tagname
+        result += '\n'
         return result
 
     def renderAtt(self):
         result = ''
-        for n, v in self.attributes:
+        for n, v in self.attributes.iteritems():
             if n != 'txt' and n != 'open':
                 if n == 'cl': n = 'class'
                 result += ' %s="%s"' % (n, v)
@@ -86,6 +97,7 @@ class Tag(list):
 def TagFactory(name):
     class f(Tag):
         tagname = name
+    f.__name__ = name
     return f
 
 thisModule = modules[__name__]
@@ -97,73 +109,34 @@ def ValidW3C():
                     txt=img(src='http://www.w3.org/Icons/valid-xhtml10', alt='Valid XHTML 1.0 Strict'))
     return out
 
-class PyH (Tag):
-    header, footer = '', ''
-    tagname = 'body'
-    javascripts, stylesheets, _meta = [], [], []
-    lang = 'en'
-    def __init__(self, title='MyPyHPage'):
-        self.title = title
-        self.counter = TagCounter(title)
+class PyH(Tag):
+    tagname = 'html'
     
-    def addMeta(self, name='', content='', http_equiv=''):
-        if content:
-            meta = {'content':content, 'name':name, 'http-equiv':http_equiv}
+    def __init__(self, name='MyPyHPage'):
+        self += head()
+        self += body()
+        self.attributes = dict(xmlns='http://www.w3.org/1999/xhtml', lang='en')
+        self.head += title(name)
 
-    def tag(self, **kw):
-        "Core function to generate tags"
-        noNewLine = ['td', 'th', 'input']
-        selfClose = ['input', 'img', 'link']
-        _name = kw.get('tagname', None)
-        if not isLegal(_name): return ''
-        open = kw.get('open', 'cl' in kw or 'id' in kw or c.isClosed(_name))
-        c = self._counter
-        if not c.isAllowed(_name, open) : return ''
-        out = '<%s%s' % ((not open) * '/', _name)
-        if open:
-            c.open(_name)
-            for i,v in kw.iteritems():
-                if i != 'txt' and i != 'open':
-                    if i == 'cl': i = 'class'
-                    out += ' %s="%s"' % (i, v)
-        else: c.close(_name)
-        if _name in selfClose:
-            out += ' /'
-            c.close(_name)
-        out += '>'
-        if 'txt' in kw.keys() or ('src' in kw.keys() and _name != 'img'):
-            out += '%s%s' % (kw.get('txt', ''), '</%s>' % _name)
-            c.close(_name)
-        if not open and _name not in noNewLine: out += nl
-        return out
+    def __iadd__(self, obj):
+        if isinstance(obj, head) or isinstance(obj, body): self.addObj(obj)
+        elif isinstance(obj, meta) or isinstance(obj, link): self.head += obj
+        else: self.body += obj
+        return self
+
+    def addJS(self, file):
+        self.head += script(type='text/javascript', src=file)
+
+    def addCSS(self, file):
+        self.head += link(rel='stylesheet', type='text/css', href=file)
     
     def printOut(self,file=''):
         if file: f = open(file, 'w')
         else: f = stdout
-        self += doctype
-        html = self.renderHeader()
-        html += self
-        f.write(html.render())
+        f.write(doctype)
+        f.write(self.render())
         f.flush()
-        f.close()
-
-    def renderHeader(self):
-        h = html(xmlns='http://www.w3.org/1999/xhtml', lang=self._lang)
-        he = head()
-        he += charset
-        he += title(txt=self._title)
-        for s in self._stylesheets:
-            he += link(rel='stylesheet',type='text/css',href=s)
-        for j in self._javascripts:
-            he += script(type='text/javascript',src=j)
-        h += he
-        return h
-
-    def renderFooter(self):
-        f = self._footer
-        f += body()
-        f += html()
-        return f
+        if file: f.close()
     
 class TagCounter:
     _count = {}
