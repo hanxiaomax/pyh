@@ -14,16 +14,16 @@ from sys import _getframe, stdout, modules, version
 nOpen={}
 
 nl = '\n'
-br = '<br />'+nl
-doctype = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"\n"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n'
+#br = '<br />'+nl
+doctype = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n'
 charset = '<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />\n'
 
 tags = ['html', 'body', 'head', 'link', 'meta', 'div', 'p', 'form', 'legend', 
         'input', 'select', 'span', 'b', 'i', 'option', 'img', 'script',
         'table', 'tr', 'td', 'th', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-        'fieldset', 'a', 'title', 'body', 'head', 'title', 'script']
+        'fieldset', 'a', 'title', 'body', 'head', 'title', 'script', 'br']
 
-selfClose = ['input', 'img', 'link']
+selfClose = ['input', 'img', 'link', 'br']
 
 class Tag(list):
     tagname = ''
@@ -41,7 +41,7 @@ class Tag(list):
         for a in arg: self.addObj(a)
 
     def __iadd__(self, obj):
-        if obj.isSeq:
+        if isinstance(obj, Tag) and obj.isSeq:
             for o in obj: self.addObj(o)
         else: self.addObj(obj)
         return self
@@ -105,8 +105,7 @@ thisModule = modules[__name__]
 for t in tags: setattr(thisModule, t, TagFactory(t)) 
 
 def ValidW3C():
-    out = a(href='http://validator.w3.org/check?uri=referer',
-                    txt=img(src='http://www.w3.org/Icons/valid-xhtml10', alt='Valid XHTML 1.0 Strict'))
+    out = a(img(src='http://www.w3.org/Icons/valid-xhtml10', alt='Valid XHTML 1.0 Strict'), href='http://validator.w3.org/check?uri=referer')
     return out
 
 class PyH(Tag):
@@ -121,14 +120,17 @@ class PyH(Tag):
     def __iadd__(self, obj):
         if isinstance(obj, head) or isinstance(obj, body): self.addObj(obj)
         elif isinstance(obj, meta) or isinstance(obj, link): self.head += obj
-        else: self.body += obj
+        else:
+            self.body += obj
+            id=self.setID(obj)
+            setattr(self, id, obj)
         return self
 
-    def addJS(self, file):
-        self.head += script(type='text/javascript', src=file)
+    def addJS(self, *arg):
+        for f in arg: self.head += script(type='text/javascript', src=f)
 
-    def addCSS(self, file):
-        self.head += link(rel='stylesheet', type='text/css', href=file)
+    def addCSS(self, *arg):
+        for f in arg: self.head += link(rel='stylesheet', type='text/css', href=f)
     
     def printOut(self,file=''):
         if file: f = open(file, 'w')
