@@ -21,7 +21,7 @@ charset = '<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />\
 tags = ['html', 'body', 'head', 'link', 'meta', 'div', 'p', 'form', 'legend', 
         'input', 'select', 'span', 'b', 'i', 'option', 'img', 'script',
         'table', 'tr', 'td', 'th', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-        'fieldset', 'a', 'title', 'body', 'head', 'title', 'script', 'br']
+        'fieldset', 'a', 'title', 'body', 'head', 'title', 'script', 'br', 'table']
 
 selfClose = ['input', 'img', 'link', 'br']
 
@@ -47,20 +47,19 @@ class Tag(list):
         return self
     
     def addObj(self, obj):
-        self.append(obj)
+        if not isinstance(obj, Tag): obj = str(obj)
         id=self.setID(obj)
         setattr(self, id, obj)
+        self.append(obj)
 
     def setID(self, obj):
         if isinstance(obj, Tag):
-            if obj.id : return obj.id
-            else :
-                id = obj.tagname
-                n = len([t for t in self if isinstance(t, Tag) and t.id.startswith(id)])
+            id = obj.id
+            n = len([t for t in self if isinstance(t, Tag) and t.id.startswith(id)])
         else:
             id = 'content'
             n = len([t for t in self if not isinstance(t, Tag)])
-        if n: id = '%s-%03i' % (id, n)
+        if n: id = '%s_%03i' % (id, n)
         if isinstance(obj, Tag): obj.id = id
         return id
 
@@ -68,6 +67,10 @@ class Tag(list):
         if self.tagname: return Tag(self, obj)
         self.addObj(obj)
         return self
+
+    def __lshift__(self, obj):
+        self += obj
+        return obj
 
     def render(self):
         result = ''
@@ -92,7 +95,7 @@ class Tag(list):
         return result
 
     def selfClose(self):
-        return self.tagname in selfClose
+        return self.tagname in selfClose        
     
 def TagFactory(name):
     class f(Tag):
