@@ -1,11 +1,16 @@
-class Test(list):
-    tagname = ''
-    def __init__(self, *arg, **kw):
-        self.extend(arg)
+class Test:
+    name = ''
+    value = 0
     def __add__(self, obj):
-        if self.tagname:
-            return Test(self,obj)
-        else:
-            self.append(obj)
-            return self
+        print 'Add',self.name
+        new = Test()
+        new.name = self.name + obj.name
+        new.value = self.value + obj.value
+        return new
 
+    def __lshift__(self, obj):
+        print 'lt',self.name
+        new = Test()
+        new.name = self.name + obj.name
+        new.value = self.value + obj.value
+        return new
