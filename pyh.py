@@ -7,14 +7,13 @@ generate HTML tags from within your python code.
 See http://code.google.com/p/pyh/ for documentation.
 """
 __author__ = "Emmanuel Turlay <turlay@cern.ch>"
-__version__ = '$Revision: 19 $'
+__version__ = '$Revision: 43 $'
 __date__ = '$Date$'
 
 from sys import _getframe, stdout, modules, version
 nOpen={}
 
 nl = '\n'
-#br = '<br />'+nl
 doctype = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n'
 charset = '<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />\n'
 
