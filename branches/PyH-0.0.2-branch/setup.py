@@ -3,8 +3,8 @@
 from distutils.core import setup
 
 setup(name='PyH',
-      version='0.0.2',
-      description='A simple python module to generate web content',
+      version='0.1',
+      description='A powerful python module to generate web content',
       author='Emmanuel Turlay',
       author_email='turlay@cern.ch',
       url='http://code/google.com/p/pyh/',
