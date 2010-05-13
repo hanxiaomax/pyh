@@ -98,7 +98,7 @@ Once a tag object has been created, its HTML attributes can be modified by acces
 >>> mydiv = div()
 >>> mydiv.attributes['id'] = 'myCSSid'
 >>> mydiv.render()
-'<div id='myCSSid'></div>\n'
+'<div id="myCSSid"></div>\n'
 }}}
 Tag can be concatenated by the use of the simple `+` operator :
 {{{
@@ -113,9 +113,9 @@ Tags can be included inside higher level tags either by passing them as non-keyw
 >>> myPar = myDiv << div(id='myInnerDiv') << p(id='myPar') 
 >>> myPar << span('My first span') + span('My second span')
 >>> myDiv.render()
-'<div id='myTopLevelDiv'>
-<div id='myInnerDiv'>
-<p id='myPar'>
+'<div id="myTopLevelDiv">
+<div id="myInnerDiv">
+<p id="myPar">
 <span>My first span</span><span>My second span</span>
 </p>
 </div>
@@ -132,7 +132,7 @@ Once a tag has been included into another one it can still be accessed as a memb
 >>> myDiv.span_001 << 'content3'
 >>> myDiv.render()
 '<div>
-<span id='myspan'>content1</span>
+<span id="myspan">content1</span>
 <span>content2</span>
 <span>content3</span>
 </div>'
@@ -154,8 +154,9 @@ You can now start building your page :
 page << h1('My big title!', cl='myCSSclass')
 page << div(id='mySubtitleDiv') << h2('My sub-title')
 maindiv = page << div(id='myMainDiv')
-maindiv << h3('A smaller title') + p('follow by a small paragraph')
-maindiv << p('Main paragraph') << a(href='http://alink', 'a link')
+maindiv << h3('A smaller title') + p('followed by a small paragraph')
+maindiv << p('Main paragraph ', style='color:red;') << a(href='http://alink', 'a link')
+maindiv << span('hehe', onclick='myJavaScriptFcn(); return false;')
 maindiv << br()
 maindiv << img(src='mypicture.jpg')
 page << div(id='myFooter') << span('My footer')
@@ -163,6 +164,32 @@ page << div(id='myFooter') << span('My footer')
 Then, to output your HTML page to a file or to a browser if your script is being run by a web server :
 {{{
 page.printOut()
+}}}
+The output of this script will be
+{{{
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>My wonderful PyH page</title>
+<link href="myStylesheet1.css" type="text/css" rel="stylesheet" />
+<link href="myStylesheet2.css" type="text/css" rel="stylesheet" />
+<script src="myJavascript1.js" type="text/javascript"></script>
+<script src="myJavascript2.js" type="text/javascript"></script>
+</head>
+<body>
+<h1 class="myCSSclass">My big title!</h1>
+<div id="mySubtitleDiv"><h2>My sub-title</h2></div>
+<div id="myMainDiv">
+<h3>A smaller title</h3>
+<p>followed by a small paragraph</p>
+<p style="color:red;">Main paragraph <a href="http://alink">a link</a>
+<span onclick="myJavaScriptFcn(); return false;">hehe</span><br />
+<img src="mypicture.jpg" />
+</div>
+<div id="myFooter"><span>My footer</span>
+</div>
+</body>
+</html>
 }}}
 ==Build tables==
 =Full reference=
