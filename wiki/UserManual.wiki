@@ -7,7 +7,7 @@ PyH is a very powerful and compact python module that lets you write HTML conten
 ==Features==
   * Automatic formating of HTML tags
   * High customizability
-  * full CSS awareness
+  * full CSS and Javascript awareness
   * Automatic tag closure
   * Object-oriented coding of HTML
 =How to install PyH=
