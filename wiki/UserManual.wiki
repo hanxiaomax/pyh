@@ -1,4 +1,5 @@
 #summary User manual for the PyH library
+#labels Featured
 <wiki:toc max_depth="2" />
 = Introduction =
 
@@ -192,4 +193,45 @@ The output of this script will be
 </html>
 }}}
 ==Build tables==
+You can combine python's and pyh's full power to generate HTML tables very efficiently. Creating a simple 4 by 4 table is a cakewalk:
+{{{
+page = PyH('My wonderful PyH page')
+page << h2('Most compact way to build a 4 by 4 table')
+page << table() << tr(td('1') + td('2')) + tr(td('3') + td('4'))
+page << h2('Another way to build a 4 by 4 table')
+mytab = page << table()
+tr1 = mytab << tr()
+tr1 << td('1') + td('2')
+tr2 = mytab << tr()
+tr2 << td('3') + td('4')
+page.printOut()
+}}}
+The code will generate the following HTML (all headers have been removed for clarity) :
+{{{
+<h2>Most compact way to build a 4 by 4 table</h2>
+<table>
+<tr>
+<td>1</td><td>2</td>
+</tr><tr>
+<td>3</td><td>4</td>
+</tr>
+</table>
+<h2>Another way to build a 4 by 4 table</h2>
+<table>
+<tr>
+<td>1</td><td>2</td>
+</tr><tr>
+<td>3</td><td>4</td>
+</tr>
+</table>
+}}}
+Now if you want to create large automatized table, e.g. from a database you can go
+{{{
+mytab = page << table()
+for i in range(nrows):
+    mytr = mytab << tr()
+    for j in range(ncols):
+        mytr << td('Row %i, column %j' % (i, j))
+}}}
+which will produce a `i` by `j` array.
 =Full reference=
