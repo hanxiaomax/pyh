@@ -234,4 +234,3 @@ for i in range(nrows):
         mytr << td('Row %i, column %j' % (i, j))
 }}}
 which will produce a `i` by `j` array.
-=Full reference=
