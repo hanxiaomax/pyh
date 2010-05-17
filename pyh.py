@@ -7,8 +7,8 @@ generate HTML tags from within your python code.
 See http://code.google.com/p/pyh/ for documentation.
 """
 __author__ = "Emmanuel Turlay <turlay@cern.ch>"
-__version__ = '$Revision: 58 $'
-__date__ = '$Date: 2010-05-17 08:08:39 +0200 (Mon, 17 May 2010) $'
+__version__ = '$Revision$'
+__date__ = '$Date$'
 
 from sys import _getframe, stdout, modules, version
 nOpen={}
@@ -142,35 +142,3 @@ class PyH(Tag):
         f.flush()
         if file: f.close()
     
-class TagCounter:
-    _count = {}
-    _lastOpen = []
-    for t in tags: _count[t] = 0
-    def __init__(self, name):
-        self._name = name
-    def open(self, tag):
-        if isLegal(tag): 
-            self._count[tag] += 1
-            self._lastOpen += [tag]
-    def close(self, tag):
-        if isLegal(tag) and self._lastOpen[-1] == tag: 
-            self._count[tag] -= 1
-            self._lastOpen.pop()
-        else:
-            print 'Cross tagging is wrong'
-    def isAllowed(self, tag, open):
-        if not open and self.isClosed(tag):
-            print 'TRYING TO CLOSE NON-OPEN TAG: %s' % tag
-            return False
-        return True
-    def isOpen(self, tag):
-        if isLegal(tag): return self._count[tag]
-    def isClosed(self, tag):
-        if isLegal(tag): return not self._count[tag]
-
-    
-def isLegal(tag):
-    if tag in tags: return True
-    else:
-        print 'ILLEGAL TAG: %s' % tag
-        return False
