@@ -7,7 +7,7 @@ generate HTML tags from within your python code.
 See http://code.google.com/p/pyh/ for documentation.
 """
 __author__ = "Emmanuel Turlay <turlay@cern.ch>"
-__version__ = '$Revision: 43 $'
+__version__ = '$Revision$'
 __date__ = '$Date$'
 
 from sys import _getframe, stdout, modules, version
@@ -69,7 +69,7 @@ class Tag(list):
 
     def __lshift__(self, obj):
         self += obj
-        return obj
+        if isinstance(obj, Tag): return obj
 
     def render(self):
         result = ''
