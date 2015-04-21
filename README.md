@@ -4,21 +4,24 @@ PyH by Emmanuel Turlay (turlay@cern.ch)
 PyH is a simple python module (pyh.py) that lets you 
 generate html output in a convinient and intuitive manner.
 For more instruction go to 
-http://code.google.com/p/pyh
+[http://code.google.com/p/pyh](http://code.google.com/p/pyh
+)
 
-Installation
-============
+###Installation
 simply issue :
 
-sudo ./setup.py install
+`sudo ./setup.py install`
 
-Usage
-=====
+###Usage
 in your python script :
 
+```
 from pyh import *
+```
 see the online documentation for the rest at
 http://code.google.com/p/pyh
+
+[中文翻译文档]()
 
 
 在此基础上，进行了一些修改
