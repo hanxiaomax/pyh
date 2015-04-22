@@ -185,13 +185,13 @@ class PyH(Tag):
             txt = f.read()
             self.head += script(txt, type="text/javascript")
 
-    def printOut(self, file=''):
+    def printOut(self, file='',encodetype="utf-8"):#添加一个默认参数用来设置编码方式
         if file:
             f = open(file, 'w')
         else:
             f = stdout
         f.write(doctype)
-        f.write(unicode(self.render()).encode("gbk"))
+        f.write(unicode(self.render()).encode(encodetype))
         f.flush()
         if file:
             f.close()
