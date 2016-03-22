@@ -21,7 +21,7 @@ from pyh import *
 see the online documentation for the rest at
 http://code.google.com/p/pyh
 
-[中文翻译文档]()
+[中文翻译文档](https://github.com/hanxiaomax/pyh/wiki/pyh%E4%B8%AD%E6%96%87%E6%89%8B%E5%86%8C)
 
 
 在此基础上，进行了一些修改
