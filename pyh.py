@@ -185,9 +185,9 @@ class PyH(Tag):
             txt = f.read()
             self.head += script(txt, type="text/javascript")
 
-    def printOut(self, file='',encodetype="utf-8"):#添加一个默认参数用来设置编码方式
+    def printOut(self, file='',encodetype="utf-8", file_operation="w"):#添加一个默认参数用来设置编码方式
         if file:
-            f = open(file, 'w')
+            f = open(file, file_operation)      #添加一个文件操作参数，实际使用过程中迭代page时不一定每次都要'w'覆盖，有时需要'a'
         else:
             f = stdout
         f.write(doctype)
