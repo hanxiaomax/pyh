@@ -18,12 +18,12 @@ nl = '\n'
 doctype = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">\n'
 charset = '<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />\n'
 
-# 添加来style标签，取消了一个重复的script标签
+# 添加style,colgroup标签,thead，取消了一个重复的script标签
 tags = ['html', 'body', 'head', 'link', 'meta', 'div', 'p', 'form', 'legend',
         'input', 'select', 'span', 'b', 'i', 'option', 'img', 'style',
         'table', 'tr', 'td', 'th', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
         'fieldset', 'a', 'title', 'body', 'head', 'title', 'script', 'br', 'table',
-        'tbody','ul', 'li', 'ol']
+        'tbody','ul', 'li', 'ol', 'colgroup', 'thead']
 
 selfClose = ['input', 'img', 'link', 'br']
 
@@ -58,7 +58,8 @@ class Tag(list):
     def addObj(self, obj):
         if not isinstance(obj, Tag):
             # obj = str(obj)
-            obj=unicode(obj)
+            # obj=unicode(obj) python3 不支持该函数，所以在此将其注释
+            pass
         id = self.setID(obj)
         setattr(self, id, obj)
         self.append(obj)
@@ -115,7 +116,7 @@ class Tag(list):
 
     def renderAtt(self):
         result = ''
-        for n, v in self.attributes.iteritems():
+        for n, v in self.attributes.items():
             if n != 'txt' and n != 'open':
                 if n == 'cl':
                     n = 'class'
@@ -191,7 +192,8 @@ class PyH(Tag):
         else:
             f = stdout
         f.write(doctype)
-        f.write(unicode(self.render()).encode(encodetype))
+#        f.write(unicode(self.render()).encode(encodetype))
+        f.write(self.render().encode(encodetype))
         f.flush()
         if file:
             f.close()
