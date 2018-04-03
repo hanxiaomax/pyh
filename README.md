@@ -29,3 +29,5 @@ http://code.google.com/p/pyh
 - 修改了并添加了一些tag
 - 正确处理unicode以便输出中文
 - 添加了两个函数，从文件导入css,js代码段
+- 修改了一些bug，以便能在python3中使用
+- 修改并添加了一些tag
